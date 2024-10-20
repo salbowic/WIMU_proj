@@ -16,19 +16,44 @@ Projekt ma na celu weryfikację hipotezy badawczej czy embeddingi muzyki symboli
 * **Tydzień 4** (21-27 października)
     * Przegląd bibliografii, uzupełnienie i odświeżenie wiedzy z zakresu tematu projektu
     * Zbudowanie solidnej podstawy wiedzy na temat embeddingów symbolicznych (CLaMP) i audio (OpenL3) w kontekście cech związanych ze stylem muzycznym i technikami kompozycyjnymi.
+
 * **Tydzień 5** (28 października - 3 listopada)
     * Wstępne przygotowanie eksperymentów i konfiguracja środowiska.
         * Skonfigurowanie środowisko deweloperskiego.
-        * Zainstalowanie wymaganych bibliotek na środowisku.
-        * Odszukanie i pobranie odpowiednich zbiorów danych z dźwiękami i fragmentami muzycznymi (zarówno symbolicznymi, jak i audio), które są potrzebne do eksperymentów.
+        * Zainstalowanie na środowisku wymaganych bibliotek potrzebnych do wykorzystania modeli.
+        
 * **Tydzień 6** (4-10 listopada)
-    * Przetworzenie danych, aby były formacie, który obsługują obydwa modele.
-    * Testy działania modeli o zagnieżdzeniach muzyki symbolicznej oraz muzyki w formatach audio dla pojedynczych przykładów
+    * Spreparowanie odpowiednich zbiorów danych z dźwiękami i fragmentami muzycznymi (zarówno symbolicznymi, jak i audio), które są potrzebne do eksperymentów.
+    * Przetworzenie danych do pożądanych formatów.
+
 * **Tydzień 7** (11-17 listopada)
-    * Wizualizacja embeddingów dla przygotowanych przykładów ze zbiorów danych
+    * Testy działania modeli o zagnieżdzeniach muzyki symbolicznej oraz muzyki w formatach audio dla pojedynczych przykładów
+
 * **Tydzień 8** (18-24 listopada)
-    * Wyznaczenie metryk dla uzyskanych zagnieżdżeń w celu porównania i wyciągniecia wniosków
+
+    * Przerwa spowodowana nieobecnością jednego z członków oraz kolokwium
+
 * **Tydzień 9** (25 listopada - 1 grudnia)
+    * Opracowanie interfejsów testowych do używanych modeli
+
+* **Tydzień 10** (2-8 grudnia)
+    * Wizualizacja embeddingów dla przygotowanych przykładów ze zbiorów danych
+    * Wyznaczenie metryk dla uzyskanych zagnieżdżeń w celu porównania i wyciągniecia wniosków
+
+* **Tydzień 11** (9-15 grudnia)
+    * Badania i rozwiązywanie ewentualnych problemów
+    
+* **Tydzień 12** (16-22 grudnia)
+    * Podsumowanie badań i sformuowanie wniosków
+
+* **Tydzień 13** (23-29 grudnia)
+    * Przerwa świąteczna
+
+* **Tydzień 14** (30 grudnia - 5 stycznia)
+    * Ostateczne poprawki i oddanie projektu
+
+
+
 
 
     
