@@ -16,7 +16,23 @@ Projekt ma na celu weryfikację hipotezy badawczej czy embeddingi muzyki symboli
 * Tydzień 4 (21-27 października)
 Przegląd bibliografii, uzupełnienie i odświeżenie wiedzy z zakresu tematu projektu
 * Tydzień 5 (28 października - 3 listopada)
+
 * Tydzień 6 (4-10 listopada)
+
+## Bibliografia
+
+* https://arxiv.org/abs/2005.09406
+* https://arxiv.org/abs/2304.11029
+* "Analiza porównawcza głębokich osadzeń plików muzycznych w reprezentacji symbolicznej oraz audio" - Piotr Szachewicz 2024
+
+## Zakres eksperymentów
+
+## Funkcjonalność programu
+
+## Stack technologiczny
+
+
+## Notatki (do usunięcia)
 
 harmonogram projektu z podziałem na tygodnie i planowanymi postępami projektu per
 tydzień
@@ -32,4 +48,4 @@ Harmonogram należy czytelnie rozplanować i opisać wg dat, a nie tylko numeró
 W harmonogramie projektu należy również uwzględnić potencjalny czas potrzebny na trenowanie
 modeli i przewidywane zapotrzebowanie na zasoby obliczeniowe.
 
-## Bibliografia
+
