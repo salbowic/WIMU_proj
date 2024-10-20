@@ -12,9 +12,11 @@ Projekt ma na celu weryfikację hipotezy badawczej czy embeddingi muzyki symboli
     * Albowicz Sebastian
     * Sawicki Andrzej
 
-
-
-
+## Harmonogram
+* Tydzień 4 (21-27 października)
+Przegląd bibliografii, uzupełnienie i odświeżenie wiedzy z zakresu tematu projektu
+* Tydzień 5 (28 października - 3 listopada)
+* Tydzień 6 (4-10 listopada)
 
 harmonogram projektu z podziałem na tygodnie i planowanymi postępami projektu per
 tydzień
