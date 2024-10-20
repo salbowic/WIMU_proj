@@ -13,13 +13,14 @@ Projekt ma na celu weryfikację hipotezy badawczej czy embeddingi muzyki symboli
     * Sawicki Andrzej
 
 ## Harmonogram
+
 * **Tydzień 4** (21-27 października)
     * Przegląd bibliografii, uzupełnienie i odświeżenie wiedzy z zakresu tematu projektu
     * Zbudowanie solidnej podstawy wiedzy na temat embeddingów symbolicznych (CLaMP) i audio (OpenL3) w kontekście cech związanych ze stylem muzycznym i technikami kompozycyjnymi.
 
 * **Tydzień 5** (28 października - 3 listopada)
     * Wstępne przygotowanie eksperymentów i konfiguracja środowiska.
-        * Skonfigurowanie środowisko deweloperskiego.
+        * Skonfigurowanie środowiska deweloperskiego.
         * Zainstalowanie na środowisku wymaganych bibliotek potrzebnych do wykorzystania modeli.
         
 * **Tydzień 6** (4-10 listopada)
@@ -51,12 +52,6 @@ Projekt ma na celu weryfikację hipotezy badawczej czy embeddingi muzyki symboli
 
 * **Tydzień 14** (30 grudnia - 5 stycznia)
     * Ostateczne poprawki i oddanie projektu
-
-
-
-
-
-    
 
 
 ## Bibliografia
