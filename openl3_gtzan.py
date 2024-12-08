@@ -98,7 +98,6 @@ class EmbeddingVisualizer:
             plt.show()
 
 
-
 if __name__ == "__main__":
     # Initialize the visualizer with the dataset folder
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
