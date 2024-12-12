@@ -89,6 +89,7 @@ class EmbeddingVisualizer:
         plt.legend(title="Genre", loc='best')
         plt.grid()
 
+
         # Save or display the plot
         if save_path:
             plt.savefig(save_path, format='png', dpi=300)
