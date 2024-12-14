@@ -76,6 +76,7 @@ class EmbeddingVisualizer:
         else:
             raise ValueError("Invalid method. Choose 'pca' or 'tsne'.")
 
+
         # Plot the embeddings
         plt.figure(figsize=(12, 10))
         genres = np.unique(self.labels)
