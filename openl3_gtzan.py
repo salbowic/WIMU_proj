@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from typing import Optional
+import sys
 
 class EmbeddingVisualizer:
     def __init__(self, dataset_folder: str, model):
@@ -18,6 +19,7 @@ class EmbeddingVisualizer:
         self.model = model
         self.embeddings = []
         self.labels = []
+        self.failed_files = []
 
     def generate_embeddings(self, num_samples_per_genre: int = 10):
         """
@@ -32,22 +34,37 @@ class EmbeddingVisualizer:
             files = [file for file in os.listdir(genre_folder) if file.endswith(('.wav', '.ogg', '.flac'))]
 
             # Randomly sample files from each genre
-            sampled_files = random.sample(files, min(num_samples_per_genre, len(files)))
-            print(f"Processing {len(sampled_files)} files from genre: {genre}")
+            random.shuffle(files)
+            sampled_files = files[:num_samples_per_genre]
+            total_files = len(sampled_files)
+            print(f"Processing {total_files} files from genre: {genre}")
 
-            for file in sampled_files:
+            for i, file in enumerate(sampled_files):
                 file_path = os.path.join(genre_folder, file)
-                print(f"Processing: {file_path}")
+                try:
+                    # Read audio file
+                    audio, sr = sf.read(file_path)
+                    
+                    # Generate embedding
+                    embedding, _ = openl3.get_audio_embedding(audio, sr, model=self.model, verbose=False)
+                    
+                    # Store the embedding and label
+                    self.embeddings.append(embedding)
+                    self.labels.append(genre)
+                except Exception as e:
+                    self.failed_files.append(file_path)
 
-                # Read audio file
-                audio, sr = sf.read(file_path)
+                # Update progress
+                sys.stdout.write(f"\rProcessed {i + 1}/{total_files} files from genre: {genre}")
+                sys.stdout.flush()
 
-                # Generate OpenL3 embeddings
-                emb, ts = openl3.get_audio_embedding(audio, sr, model=self.model)
-                self.embeddings.append(emb.mean(axis=0))  # Use mean embedding for simplicity
-                self.labels.append(genre)
-
+            print()  # Move to the next line after processing all files in the genre
+            
         print(f"Processed {len(self.embeddings)} audio files from all genres.")
+        if self.failed_files:
+            print("Failed to process the following files:")
+            for file in self.failed_files:
+                print(file)
 
     def plot_embeddings(
         self, 
@@ -107,11 +124,11 @@ if __name__ == "__main__":
     visualizer = EmbeddingVisualizer(dataset_folder, model)
 
     # Generate embeddings for 10 random songs per genre
-    visualizer.generate_embeddings(num_samples_per_genre=20)
+    visualizer.generate_embeddings(num_samples_per_genre=100)
 
     # Create output folder for results
     os.makedirs("results", exist_ok=True)
 
     # Plot embeddings using t-SNE and PCA
-    visualizer.plot_embeddings(method="tsne", save_path="results/gtzan_tsne_result20.png")
-    visualizer.plot_embeddings(method="pca", save_path="results/gtzan_pca_result20.png")
+    visualizer.plot_embeddings(method="tsne", save_path="results/gtzan_tsne_result100.png")
+    visualizer.plot_embeddings(method="pca", save_path="results/gtzan_pca_result100.png")
