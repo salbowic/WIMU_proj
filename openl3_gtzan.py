@@ -154,15 +154,15 @@ def inspect_npz(file_path: str, num_elements: int = 5):
 
 
 if __name__ == "__main__":
-    # Initialize the visualizer with the dataset folder
+    # # Initialize the visualizer with the dataset folder
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
     dataset_folder = "gtzan_dataset/genres_original"
     visualizer = EmbeddingVisualizer(dataset_folder, model)
 
-    # Generate embeddings for 10 random songs per genre
-    visualizer.generate_embeddings(num_samples_per_genre=100)
+    # # Generate embeddings for 10 random songs per genre
+    # visualizer.generate_embeddings(num_samples_per_genre=100)
 
-    # Save embeddings to file
+    # # Save embeddings to file
     embeddings_file = "results/gtzan_embeddings.npz"
     # visualizer.save_embeddings(embeddings_file)
 
