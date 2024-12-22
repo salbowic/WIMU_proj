@@ -58,11 +58,12 @@ class EmbeddingVisualizer:
 
             for i, file in enumerate(sampled_files):
                 file_path = os.path.join(genre_folder, file)
+                output_dir = f'results/embeddings/{genre}'
+                os.makedirs(output_dir, exist_ok=True)
+                
                 try:
-                    # Process embedding
-                    output_dir = f'results/embeddings/{genre}'
-                    os.makedirs(output_dir, exist_ok=True)
-                    openl3.process_audio_file(file_path, model = self.model, suffix='_emb', output_dir=f'results/embeddings/{genre}', verbose=False)
+                    # Process audio file and save embedding to disk
+                    openl3.process_audio_file(file_path, model=self.model, suffix='_emb', output_dir=output_dir, verbose=False)
                     
                 except Exception as e:
                     print(f"Failed to process {file_path}: {e}")
@@ -74,23 +75,23 @@ class EmbeddingVisualizer:
 
             print()
             
-        print(f"Processed {len(self.embeddings)} audio files from all genres.")
+        print(f"Finished processing audio files from all genres.")
         if self.failed_files:
             print("Failed to process the following files:")
             for file in self.failed_files:
                 print(file)
 
 
-    def load_embeddings(self, output_dir: str = 'results/embeddings'):
+    def load_embeddings(self, input_dir: str = 'results/embeddings'):
         """
         Load embeddings and labels from the saved .npz files.
         :param output_dir: Directory where the embeddings are saved.
         """
-        genres = [genre for genre in os.listdir(output_dir) if os.path.isdir(os.path.join(output_dir, genre))]
+        genres = [genre for genre in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, genre))]
         print(f"Loading found genres: {genres}")
 
         for genre in genres:
-            genre_folder = os.path.join(output_dir, genre)
+            genre_folder = os.path.join(input_dir, genre)
             files = [file for file in os.listdir(genre_folder) if file.endswith('_emb.npz')]
 
             for file in files:
@@ -100,10 +101,12 @@ class EmbeddingVisualizer:
                     # Load the saved embedding
                     data = np.load(file_path)
                     embedding = data['embedding']
+                    mean_emb = embedding.mean(axis=0)  # Use mean embedding for simplicity
                     
                     # Store the embedding and label
-                    self.embeddings.append(embedding)
+                    self.embeddings.append(mean_emb)
                     self.labels.append(genre)
+                    
                 except Exception as e:
                     print(f"Failed to load {file_path}: {e}")
 
@@ -160,7 +163,6 @@ class EmbeddingVisualizer:
             plt.show()
 
 
-
 def inspect_npz(file_path: str, num_elements: int = 5):
     """
     Inspect the structure of a .npz file and print its contents.
@@ -175,16 +177,16 @@ def inspect_npz(file_path: str, num_elements: int = 5):
 
 
 if __name__ == "__main__":
-    # # Initialize the visualizer with the dataset folder
+    # Initialize the visualizer with the dataset folder
     visualizer = EmbeddingVisualizer()
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
     dataset_folder = "gtzan_dataset\genres_original"
-    # visualizer.set_dataset_folder(dataset_folder)
-    # visualizer.set_model(model)
+    visualizer.set_dataset_folder(dataset_folder)
+    visualizer.set_model(model)
     
 
     # Generate embeddings for 10 random songs per genre
-    # visualizer.generate_embeddings(num_samples_per_genre=100)
+    visualizer.generate_embeddings(num_samples_per_genre=100)
 
     # Load embeddings from file
     visualizer.load_embeddings()
