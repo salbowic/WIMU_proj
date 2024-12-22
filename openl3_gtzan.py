@@ -153,7 +153,6 @@ def inspect_npz(file_path: str, num_elements: int = 5):
         print(f"First {num_elements} elements of {key}: {data[key][:num_elements]}")
 
 
-
 if __name__ == "__main__":
     # Initialize the visualizer with the dataset folder
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
