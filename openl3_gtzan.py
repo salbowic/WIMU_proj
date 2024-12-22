@@ -10,7 +10,13 @@ from typing import Optional
 import sys
     
 class EmbeddingVisualizer:
-    def __init__(self, dataset_folder: str, model):
+    def __init__(
+        self,
+        dataset_folder: str = None,
+        model = openl3.models.load_audio_embedding_model(input_repr="mel128",
+                                                         content_type="music",
+                                                         embedding_size=6144)
+        ):
         """
         Initialize the visualizer with the dataset folder path.
         :param dataset_folder: Path to the GTZAN dataset folder.
@@ -20,6 +26,18 @@ class EmbeddingVisualizer:
         self.embeddings = []
         self.labels = []
         self.failed_files = []
+        
+    def get_dataset_folder(self):
+        return self.dataset_folder
+    
+    def set_dataset_folder(self, dataset_folder):
+        self.dataset_folder = dataset_folder
+        
+    def get_model(self):
+        return self.model
+    
+    def set_model(self, model):
+        self.model = model
 
     def generate_embeddings(self, num_samples_per_genre: int = 10):
         """
@@ -37,29 +55,24 @@ class EmbeddingVisualizer:
             random.shuffle(files)
             sampled_files = files[:num_samples_per_genre]
             total_files = len(sampled_files)
-            print(f"Processing {total_files} files from genre: {genre}")
 
             for i, file in enumerate(sampled_files):
                 file_path = os.path.join(genre_folder, file)
                 try:
-                    # Read audio file
-                    audio, sr = sf.read(file_path)
-                    
-                    # Generate embedding
-                    embedding, _ = openl3.get_audio_embedding(audio, sr, model=self.model, verbose=False)
-
-                    # Store the embedding and label
-                    self.embeddings.append(embedding.mean(axis=0))  # Use mean embedding for simplicity
-                    self.labels.append(genre)
+                    # Process embedding
+                    output_dir = f'results/embeddings/{genre}'
+                    os.makedirs(output_dir, exist_ok=True)
+                    openl3.process_audio_file(file_path, model = self.model, suffix='_emb', output_dir=f'results/embeddings/{genre}', verbose=False)
                     
                 except Exception as e:
+                    print(f"Failed to process {file_path}: {e}")
                     self.failed_files.append(file_path)
 
                 # Update progress
                 sys.stdout.write(f"\rProcessed {i + 1}/{total_files} files from genre: {genre}")
                 sys.stdout.flush()
 
-            print()  # Move to the next line after processing all files in the genre
+            print()
             
         print(f"Processed {len(self.embeddings)} audio files from all genres.")
         if self.failed_files:
@@ -68,25 +81,33 @@ class EmbeddingVisualizer:
                 print(file)
 
 
-    def save_embeddings(self, file_path: str):
+    def load_embeddings(self, output_dir: str = 'results/embeddings'):
         """
-        Save embeddings and labels to a file.
-        :param file_path: Path to the file where embeddings and labels will be saved.
+        Load embeddings and labels from the saved .npz files.
+        :param output_dir: Directory where the embeddings are saved.
         """
-        np.savez(file_path, embeddings=self.embeddings, labels=self.labels)
-        print(f"Embeddings and labels saved to {file_path}")
+        genres = [genre for genre in os.listdir(output_dir) if os.path.isdir(os.path.join(output_dir, genre))]
+        print(f"Loading found genres: {genres}")
 
+        for genre in genres:
+            genre_folder = os.path.join(output_dir, genre)
+            files = [file for file in os.listdir(genre_folder) if file.endswith('_emb.npz')]
 
-    def load_embeddings(self, file_path: str):
-        """
-        Load embeddings and labels from a file.
-        :param file_path: Path to the file from which embeddings and labels will be loaded.
-        """
-        data = np.load(file_path, allow_pickle=True)
-        self.embeddings = data['embeddings']
-        self.labels = data['labels']
-        print(f"Embeddings and labels loaded from {file_path}")
-        
+            for file in files:
+                file_path = os.path.join(genre_folder, file)
+                
+                try:
+                    # Load the saved embedding
+                    data = np.load(file_path)
+                    embedding = data['embedding']
+                    
+                    # Store the embedding and label
+                    self.embeddings.append(embedding)
+                    self.labels.append(genre)
+                except Exception as e:
+                    print(f"Failed to load {file_path}: {e}")
+
+        print(f"Loaded {len(self.embeddings)} embeddings from all genres.")
         
     def plot_embeddings(
         self, 
@@ -155,23 +176,22 @@ def inspect_npz(file_path: str, num_elements: int = 5):
 
 if __name__ == "__main__":
     # # Initialize the visualizer with the dataset folder
+    visualizer = EmbeddingVisualizer()
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
-    dataset_folder = "gtzan_dataset/genres_original"
-    visualizer = EmbeddingVisualizer(dataset_folder, model)
+    dataset_folder = "gtzan_dataset\genres_original"
+    # visualizer.set_dataset_folder(dataset_folder)
+    # visualizer.set_model(model)
+    
 
-    # # Generate embeddings for 10 random songs per genre
+    # Generate embeddings for 10 random songs per genre
     # visualizer.generate_embeddings(num_samples_per_genre=100)
 
-    # # Save embeddings to file
-    embeddings_file = "results/gtzan_embeddings.npz"
-    # visualizer.save_embeddings(embeddings_file)
-
     # Load embeddings from file
-    visualizer.load_embeddings(embeddings_file)
+    visualizer.load_embeddings()
     
-    # Create output folder for results
-    os.makedirs("results", exist_ok=True)
+    # # Create output folder for results
+    # os.makedirs("results", exist_ok=True)
 
-    # Plot embeddings using t-SNE and PCA
-    visualizer.plot_embeddings(method="tsne", save_path="results/gtzan_tsne_result100.png")
-    visualizer.plot_embeddings(method="pca", save_path="results/gtzan_pca_result100.png")
+    # # Plot embeddings using t-SNE and PCA
+    visualizer.plot_embeddings(method="tsne", save_path="results/gtzan_tsne_result100v2.png")
+    visualizer.plot_embeddings(method="pca", save_path="results/gtzan_pca_result100v2.png")
