@@ -71,8 +71,6 @@ if __name__ == "__main__":
         print_instructions()
         sys.exit(1)
 
-    
-    
     # Create output folder for results
     os.makedirs(embedding_dir, exist_ok=True)
     os.makedirs(plot_dir, exist_ok=True)
