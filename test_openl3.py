@@ -8,8 +8,8 @@ def print_instructions():
     Usage: python test_openl3.py [options]
     
     Options:
-    --input-repr <input_repr>          Input representation (default: mel128)
-    --embedding-size <embedding_size>  Embedding size (default: 6144)
+    --input-repr <input_repr>          Input representation (default: mel128, accepted values: linear, mel128, mel256)
+    --embedding-size <embedding_size>  Embedding size (default: 6144, accepted values: 512, 6144)
     --dataset-folder <dataset_folder>  Path to the dataset folder (default: gtzan_dataset/genres_original)
     --n-samples <n_samples>            Number of samples per genre (default: 100)
     --generate-embeddings              Generate embeddings (default: False)
@@ -43,8 +43,12 @@ if __name__ == "__main__":
         for i in range(len(args)):
             if args[i] == "--input-repr":
                 input_repr = args[i + 1]
+                if input_repr not in ["linear", "mel128", "mel256"]:
+                    raise ValueError(f"Invalid input representation: {input_repr}")
             elif args[i] == "--embedding-size":
                 embedding_size = int(args[i + 1])
+                if embedding_size not in [512, 6144]:
+                    raise ValueError(f"Invalid embedding size: {embedding_size}")
             elif args[i] == "--dataset-folder":
                 dataset_folder = args[i + 1]
             elif args[i] == "--n-samples":
@@ -59,8 +63,8 @@ if __name__ == "__main__":
                 plot_name = args[i + 1]
             elif args[i] == "--plot-method":
                 plot_method = args[i + 1]
-    except (IndexError, ValueError):
-        print("Error: Invalid arguments")
+    except (IndexError, ValueError) as e:
+        print(f"Error: {e}")
         print_instructions()
         sys.exit(1)
 
