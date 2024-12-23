@@ -39,7 +39,7 @@ class EmbeddingVisualizer:
     def set_model(self, model):
         self.model = model
 
-    def generate_embeddings(self, num_samples_per_genre: int = 10):
+    def generate_embeddings(self, num_samples_per_genre: int = 10, emb_dir: str = 'results/embeddings'):
         """
         Generate embeddings for audio files in the dataset.
         :param num_samples_per_genre: Number of audio samples to process per genre.
@@ -58,7 +58,7 @@ class EmbeddingVisualizer:
 
             for i, file in enumerate(sampled_files):
                 file_path = os.path.join(genre_folder, file)
-                output_dir = f'results/embeddings/{genre}'
+                output_dir = f'{emb_dir}/{genre}'
                 os.makedirs(output_dir, exist_ok=True)
                 
                 try:
@@ -181,15 +181,18 @@ if __name__ == "__main__":
     visualizer = EmbeddingVisualizer()
     model = openl3.models.load_audio_embedding_model(input_repr="mel128", content_type="music", embedding_size=6144)
     dataset_folder = "gtzan_dataset\genres_original"
+    n_samples_per_genre = 100
+    generate_embeddings = False
     visualizer.set_dataset_folder(dataset_folder)
     visualizer.set_model(model)
     
 
     # Generate embeddings for 10 random songs per genre
-    visualizer.generate_embeddings(num_samples_per_genre=100)
+    visualizer.generate_embeddings(num_samples_per_genre=n_samples_per_genre)
 
     # Load embeddings from file
-    visualizer.load_embeddings()
+    if not generate_embeddings:
+        visualizer.load_embeddings()
     
     # # Create output folder for results
     # os.makedirs("results", exist_ok=True)
