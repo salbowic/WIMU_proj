@@ -1,4 +1,4 @@
-from openl3_gtzan import EmbeddingVisualizer
+from openl3_embedding_generator import EmbeddingVisualizer
 import os
 import openl3
 import sys
