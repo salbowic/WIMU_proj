@@ -1,3 +1,6 @@
+from openl3_gtzan import EmbeddingVisualizer
+import os
+import openl3
 import sys
 
 def print_instructions():
@@ -5,67 +8,55 @@ def print_instructions():
     Usage: python test_openl3.py [options]
     
     Options:
-    --input-repr <input_repr>          Input representation (default: mel128, accepted values: linear, mel128, mel256)
-    --embedding-size <embedding_size>  Embedding size (default: 6144, accepted values: 512, 6144)
-    --dataset-folder <dataset_folder>  Path to the dataset folder (default: gtzan_dataset/genres_original)
-    --n-samples <n_samples>            Number of samples per genre (default: 100)
-    --generate-embeddings              Generate embeddings (default: False)
-    --embedding-dir <embedding_dir>    Directory to save embeddings (default: results/embeddings)
-    --plot-dir <plot_dir>              Directory to save plots (default: results/plots)
-    --plot-name <plot_name>            Name of the plot file (default: plot1.png)
-    --plot-method <plot_method>        Plot method (tsne, pca, or both) (default: both)
-    --help                             Show this help message and exit
+    --generate-embeddings <input_repr> <embedding_size> <dataset_folder> <n_samples> 
+        Generate embeddings with specified parameters (default: mel128 6144 gtzan_dataset/genres_original 100)
+    --embedding-dir <embedding_dir>    
+        Directory to save and/or load embeddings (default: results/embeddings). Embeddings are saved in /<embedding_dir>/class
+    --plot <plot_dir> <plot_name> <plot_method> 
+        Directory to save plots, name of the plot file, and plot method (tsne, pca, or both) (default: results/plots plot1.png both)
+    --help                             
+        Show this help message and exit
     """
     print(instructions)
 
 if __name__ == "__main__":
-
+    # Parse command line arguments
     args = sys.argv[1:]
     if "--help" in args:
         print_instructions()
-        quit()
+        sys.exit(0)
 
-
-    from openl3_gtzan import EmbeddingVisualizer
-    import os
-    import openl3
-    
     # Default values
     input_repr = "mel128"
     embedding_size = 6144
     dataset_folder = "gtzan_dataset/genres_original"
     n_samples_per_genre = 100
     generate_embeddings = False
+    plot=False
     embedding_dir = "results/embeddings"
     plot_dir = "results/plots"
     plot_name = "plot1.png"
     plot_method = "both"
-    
-    # Parse command line arguments
+
     try:
         for i in range(len(args)):
-            if args[i] == "--input-repr":
+            if args[i] == "--generate-embeddings":
+                generate_embeddings = True
                 input_repr = args[i + 1]
                 if input_repr not in ["linear", "mel128", "mel256"]:
                     raise ValueError(f"Invalid input representation: {input_repr}")
-            elif args[i] == "--embedding-size":
-                embedding_size = int(args[i + 1])
+                embedding_size = int(args[i + 2])
                 if embedding_size not in [512, 6144]:
                     raise ValueError(f"Invalid embedding size: {embedding_size}")
-            elif args[i] == "--dataset-folder":
-                dataset_folder = args[i + 1]
-            elif args[i] == "--n-samples":
-                n_samples_per_genre = int(args[i + 1])
-            elif args[i] == "--generate-embeddings":
-                generate_embeddings = True
+                dataset_folder = args[i + 3]
+                n_samples_per_genre = int(args[i + 4])
             elif args[i] == "--embedding-dir":
                 embedding_dir = args[i + 1]
-            elif args[i] == "--plot-dir":
+            elif args[i] == "--plot":
+                plot = True
                 plot_dir = args[i + 1]
-            elif args[i] == "--plot-name":
-                plot_name = args[i + 1]
-            elif args[i] == "--plot-method":
-                plot_method = args[i + 1]
+                plot_name = args[i + 2]
+                plot_method = args[i + 3]
     except (IndexError, ValueError) as e:
         print(f"Error: {e}")
         print_instructions()
@@ -85,13 +76,12 @@ if __name__ == "__main__":
         visualizer.generate_embeddings(num_samples_per_genre=n_samples_per_genre, emb_dir=embedding_dir)
 
     # Load embeddings from file
-    if not generate_embeddings:
+    if plot:
         visualizer = EmbeddingVisualizer()
         visualizer.load_embeddings(input_dir=embedding_dir)
-    
-    # Plot embeddings using t-SNE and/or PCA
-    if plot_method.lower() == "both":
-        visualizer.plot_embeddings(method="tsne", save_path=f"{plot_dir}/{plot_name}_tsne.png")
-        visualizer.plot_embeddings(method="pca", save_path=f"{plot_dir}/{plot_name}_pca.png")
-    else:
-        visualizer.plot_embeddings(method=plot_method.lower(), save_path=f"{plot_dir}/{plot_name}")
+        # Plot embeddings using t-SNE and/or PCA
+        if plot_method.lower() == "both":
+            visualizer.plot_embeddings(method="tsne", save_path=f"{plot_dir}/{plot_name}_tsne.png")
+            visualizer.plot_embeddings(method="pca", save_path=f"{plot_dir}/{plot_name}_pca.png")
+        else:
+            visualizer.plot_embeddings(method=plot_method.lower(), save_path=f"{plot_dir}/{plot_name}")
