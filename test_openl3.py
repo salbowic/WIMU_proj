@@ -1,6 +1,3 @@
-from openl3_gtzan import EmbeddingVisualizer
-import os
-import openl3
 import sys
 
 def print_instructions():
@@ -22,6 +19,17 @@ def print_instructions():
     print(instructions)
 
 if __name__ == "__main__":
+
+    args = sys.argv[1:]
+    if "--help" in args:
+        print_instructions()
+        quit()
+
+
+    from openl3_gtzan import EmbeddingVisualizer
+    import os
+    import openl3
+    
     # Default values
     input_repr = "mel128"
     embedding_size = 6144
@@ -32,13 +40,8 @@ if __name__ == "__main__":
     plot_dir = "results/plots"
     plot_name = "plot1.png"
     plot_method = "both"
-
+    
     # Parse command line arguments
-    args = sys.argv[1:]
-    if "--help" in args:
-        print_instructions()
-        sys.exit(0)
-
     try:
         for i in range(len(args)):
             if args[i] == "--input-repr":
