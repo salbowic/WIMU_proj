@@ -68,12 +68,7 @@ if __name__ == "__main__":
         print_instructions()
         sys.exit(1)
 
-    # Initialize the visualizer with the dataset folder
-    visualizer = EmbeddingVisualizer()
-    model = openl3.models.load_audio_embedding_model(input_repr=input_repr, content_type="music", embedding_size=embedding_size)
     
-    visualizer.set_dataset_folder(dataset_folder)
-    visualizer.set_model(model)
     
     # Create output folder for results
     os.makedirs(embedding_dir, exist_ok=True)
@@ -81,10 +76,16 @@ if __name__ == "__main__":
 
     # Generate embeddings for the specified number of samples per genre
     if generate_embeddings:
+        # Initialize the visualizer with the dataset folder
+        visualizer = EmbeddingVisualizer()
+        model = openl3.models.load_audio_embedding_model(input_repr=input_repr, content_type="music", embedding_size=embedding_size)
+        visualizer.set_dataset_folder(dataset_folder)
+        visualizer.set_model(model)
         visualizer.generate_embeddings(num_samples_per_genre=n_samples_per_genre, emb_dir=embedding_dir)
 
     # Load embeddings from file
     if not generate_embeddings:
+        visualizer = EmbeddingVisualizer()
         visualizer.load_embeddings(input_dir=embedding_dir)
     
     # Plot embeddings using t-SNE and/or PCA
