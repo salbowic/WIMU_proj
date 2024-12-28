@@ -123,7 +123,8 @@ class EmbeddingVisualizer:
         :param input_dir: Directory where the embeddings are saved.
         :return: Dictionary with genres as keys and centroid embeddings as values.
         """
-        self.load_embeddings(input_dir)
+        if not self.embeddings:
+            self.load_embeddings(input_dir)
         
         genre_centroids = {}
         genres = np.unique(self.labels)
@@ -153,12 +154,17 @@ class EmbeddingVisualizer:
         if method == "pca":
             reducer = PCA(n_components=2)
             reduced_emb = reducer.fit_transform(embeddings_array)
+            reduced_centroids = reducer.fit_transform(np.array(list(self.centroids.values())))
         elif method == "tsne":
             n_samples = len(embeddings_array)
             perplexity = min(30, max(1, n_samples - 1))
             print(f"Using perplexity={perplexity} for t-SNE")
             reducer = TSNE(n_components=2, perplexity=perplexity, random_state=42)
             reduced_emb = reducer.fit_transform(embeddings_array)
+            # Adjust perplexity for centroids
+            centroid_perplexity = min(30, max(1, len(self.centroids) - 1))
+            centroid_reducer = TSNE(n_components=2, perplexity=centroid_perplexity, random_state=42)
+            reduced_centroids = centroid_reducer.fit_transform(np.array(list(self.centroids.values())))
         else:
             raise ValueError("Invalid method. Choose 'pca' or 'tsne'.")
 
@@ -172,9 +178,9 @@ class EmbeddingVisualizer:
 
         # Plot centroids if available
         if self.centroids:
-            for genre, centroid in self.centroids.items():
-                reduced_centroid = reducer.transform([centroid])
-                plt.scatter(reduced_centroid[0, 0], reduced_centroid[0, 1], label=f"{genre} centroid", s=200, marker='X', edgecolors='k')
+            for i, (genre, centroid) in enumerate(self.centroids.items()):
+                reduced_centroid = reduced_centroids[i]
+                plt.scatter(reduced_centroid[0], reduced_centroid[1], s=200, marker='X', edgecolors='k')
                 
         plt.title(f"Audio Embeddings Visualization ({method.upper()})")
         plt.xlabel("Dimension 1")
