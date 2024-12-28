@@ -25,6 +25,7 @@ class EmbeddingVisualizer:
         self.model = model
         self.embeddings = []
         self.labels = []
+        self.centroids = []
         self.failed_files = []
         
     def get_dataset_folder(self):
@@ -39,7 +40,7 @@ class EmbeddingVisualizer:
     def set_model(self, model):
         self.model = model
 
-    def generate_embeddings(self, num_samples_per_genre: int = 10, emb_dir: str = 'results/embeddings'):
+    def generate_embeddings(self, num_samples_per_genre: int = 10, emb_dir: str = 'results/embeddings/embeddings1'):
         """
         Generate embeddings for audio files in the dataset.
         :param num_samples_per_genre: Number of audio samples to process per genre.
@@ -82,7 +83,7 @@ class EmbeddingVisualizer:
                 print(file)
 
 
-    def load_embeddings(self, input_dir: str = 'results/embeddings'):
+    def load_embeddings(self, input_dir: str = 'results/embeddings/embeddings1'):
         """
         Load embeddings and labels from the saved .npz files.
         :param output_dir: Directory where the embeddings are saved.
@@ -111,6 +112,27 @@ class EmbeddingVisualizer:
                     print(f"Failed to load {file_path}: {e}")
 
         print(f"Loaded {len(self.embeddings)} embeddings from all genres.")
+  
+  
+    def calculate_genre_centroids(self, input_dir: str = 'results/embeddings/embeddings1'):
+        """
+        Calculate and return the centroids of the genre embeddings.
+        :param input_dir: Directory where the embeddings are saved.
+        :return: Dictionary with genres as keys and centroid embeddings as values.
+        """
+        self.load_embeddings(input_dir)
+        
+        genre_centroids = {}
+        genres = np.unique(self.labels)
+        
+        for genre in genres:
+            genre_embeddings = [self.embeddings[i] for i in range(len(self.embeddings)) if self.labels[i] == genre]
+            genre_centroid = np.mean(genre_embeddings, axis=0)
+            genre_centroids[genre] = genre_centroid
+        
+        self.centroids = genre_centroids
+        return genre_centroids
+    
         
     def plot_embeddings(
         self, 
@@ -161,3 +183,16 @@ class EmbeddingVisualizer:
             plt.close()
         else:
             plt.show()
+
+if __name__ == "__main__":
+    # Initialize the visualizer with the dataset folder
+    dataset_folder = "gtzan_dataset/genres_original"
+    visualizer = EmbeddingVisualizer(dataset_folder)
+
+    # Generate embeddings for 10 random songs per genre
+    visualizer.generate_embeddings(num_samples_per_genre=10)
+
+    # Calculate and print genre centroids
+    centroids = visualizer.calculate_genre_centroids(input_dir="results/embeddings/embeddings1")
+    for genre, centroid in centroids.items():
+        print(f"Centroid for {genre}: {centroid}")

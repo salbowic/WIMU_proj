@@ -1,4 +1,3 @@
 gtzan_dataset
 dataset
-results/gtzan_embeddings_mel128_6144
-results/gtzan_embeddings_mel256_6144
+results/embeddings
