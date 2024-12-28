@@ -169,6 +169,12 @@ class EmbeddingVisualizer:
             idx = np.where(np.array(self.labels) == genre)[0]
             plt.scatter(reduced_emb[idx, 0], reduced_emb[idx, 1], label=genre, s=100, alpha=0.7)
 
+        # Plot centroids if available
+        if self.centroids:
+            for genre, centroid in self.centroids.items():
+                reduced_centroid = reducer.transform([centroid])
+                plt.scatter(reduced_centroid[0, 0], reduced_centroid[0, 1], label=f"{genre} centroid", s=200, marker='X', edgecolors='k')
+                
         plt.title(f"Audio Embeddings Visualization ({method.upper()})")
         plt.xlabel("Dimension 1")
         plt.ylabel("Dimension 2")
