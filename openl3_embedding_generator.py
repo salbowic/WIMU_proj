@@ -112,7 +112,7 @@ class EmbeddingVisualizer:
                     print(f"Failed to load {file_path}: {e}")
 
         # Calculate centroids
-        self._calculate_genre_centroids()
+        self._calculate_genre_centroids(input_dir=input_dir)
         
         print(f"Loaded {len(self.embeddings)} embeddings from all genres.")
   
