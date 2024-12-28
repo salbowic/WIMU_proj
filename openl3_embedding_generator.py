@@ -189,16 +189,5 @@ class EmbeddingVisualizer:
             plt.close()
         else:
             plt.show()
-
-if __name__ == "__main__":
-    # Initialize the visualizer with the dataset folder
-    dataset_folder = "gtzan_dataset/genres_original"
-    visualizer = EmbeddingVisualizer(dataset_folder)
-
-    # Generate embeddings for 10 random songs per genre
-    visualizer.generate_embeddings(num_samples_per_genre=10)
-
-    # Calculate and print genre centroids
-    centroids = visualizer.calculate_genre_centroids(input_dir="results/embeddings/embeddings1")
-    for genre, centroid in centroids.items():
-        print(f"Centroid for {genre}: {centroid}")
+      
+            
