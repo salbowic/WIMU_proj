@@ -111,10 +111,13 @@ class EmbeddingVisualizer:
                 except Exception as e:
                     print(f"Failed to load {file_path}: {e}")
 
+        # Calculate centroids
+        self._calculate_genre_centroids()
+        
         print(f"Loaded {len(self.embeddings)} embeddings from all genres.")
   
   
-    def calculate_genre_centroids(self, input_dir: str = 'results/embeddings/embeddings1'):
+    def _calculate_genre_centroids(self, input_dir: str = 'results/embeddings/embeddings1'):
         """
         Calculate and return the centroids of the genre embeddings.
         :param input_dir: Directory where the embeddings are saved.
@@ -131,9 +134,7 @@ class EmbeddingVisualizer:
             genre_centroids[genre] = genre_centroid
         
         self.centroids = genre_centroids
-        return genre_centroids
     
-        
     def plot_embeddings(
         self, 
         method: str = "pca", 
