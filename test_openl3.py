@@ -33,9 +33,9 @@ if __name__ == "__main__":
     n_samples_per_genre = 100
     generate_embeddings = False
     plot=False
-    embedding_dir = "results/embeddings"
+    embedding_dir = "results/embeddings/gtzan_embeddings_mel128_6144"
     plot_dir = "results/plots"
-    plot_name = "plot1.png"
+    plot_name = "plot1"
     plot_method = "both"
 
     try:
@@ -84,4 +84,4 @@ if __name__ == "__main__":
             visualizer.plot_embeddings(method="tsne", save_path=f"{plot_dir}/{plot_name}_tsne.png")
             visualizer.plot_embeddings(method="pca", save_path=f"{plot_dir}/{plot_name}_pca.png")
         else:
-            visualizer.plot_embeddings(method=plot_method.lower(), save_path=f"{plot_dir}/{plot_name}")
+            visualizer.plot_embeddings(method=plot_method.lower(), save_path=f"{plot_dir}/{plot_name}_{plot_method.lower()}.png")
