@@ -95,26 +95,33 @@ class EmbeddingVisualizer:
 
         for genre in genres:
             genre_folder = os.path.join(input_dir, genre)
-            files = [file for file in os.listdir(genre_folder) if file.endswith('.npz')]
+            files = [file for file in os.listdir(genre_folder) if file.endswith(('.npz', '.npy'))]
 
             for file in files:
                 file_path = os.path.join(genre_folder, file)
                 
                 try:
-                    # Load the saved embedding
                     data = np.load(file_path)
-                    print(f"Keys in {file_path}: {list(data.keys())}")
+                    # Load the saved embedding
+                    if file.endswith('.npz'):   
+                        if 'embedding' in data:
+                            embedding = data['embedding']
+                        elif 'data' in data:
+                            embedding = data['data']
+                        else:
+                            # Interpret the entire data as the embedding
+                            embedding = data[list(data.keys())[0]]
+                    elif file.endswith('.npy'):
+                        embedding = data
                     
-                    if 'embedding' in data:
-                        embedding = data['embedding']
-                    elif 'data' in data:
-                        embedding = data['data']
+                    # Check if embedding has 3 axes and reduce the 1st or 2nd axis if necessary
+                    if embedding.ndim == 3:
+                        mean_emb = embedding.mean(axis=(0,1))
+                    elif embedding.ndim == 2:
+                        mean_emb = embedding.mean(axis=0)
                     else:
-                        raise KeyError(f"Neither 'embedding' nor 'data' key found in {file_path}")
-                    
-                    print(f"Shape of embedding in {file_path}: {embedding.shape}")
-                    mean_emb = embedding.mean(axis=0)  # Use mean embedding for simplicity
-                    
+                        mean_emb = embedding
+
                     # Store the embedding and label
                     self.embeddings.append(mean_emb)
                     self.labels.append(genre)
@@ -153,7 +160,7 @@ class EmbeddingVisualizer:
         self.centroids = genre_centroids
         return genre_centroids
 
- 
+
     def plot_embeddings(
         self, 
         method: str = "pca", 
@@ -169,6 +176,7 @@ class EmbeddingVisualizer:
 
         embeddings_array = np.array(self.embeddings)
 
+        
         if method == "pca":
             reducer = PCA(n_components=2)
             reduced_emb = reducer.fit_transform(embeddings_array)
@@ -178,7 +186,9 @@ class EmbeddingVisualizer:
             perplexity = min(30, max(1, n_samples - 1))
             print(f"Using perplexity={perplexity} for t-SNE")
             reducer = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+            
             reduced_emb = reducer.fit_transform(embeddings_array)
+            
             # Adjust perplexity for centroids
             centroid_perplexity = min(30, max(1, len(self.centroids) - 1))
             centroid_reducer = TSNE(n_components=2, perplexity=centroid_perplexity, random_state=42)
@@ -199,13 +209,13 @@ class EmbeddingVisualizer:
             for i, (genre, centroid) in enumerate(self.centroids.items()):
                 reduced_centroid = reduced_centroids[i]
                 plt.scatter(reduced_centroid[0], reduced_centroid[1], s=200, marker='X', edgecolors='k')
-                
+        
+         
         plt.title(f"Audio Embeddings Visualization ({method.upper()})")
         plt.xlabel("Dimension 1")
         plt.ylabel("Dimension 2")
         plt.legend(title="Genre", loc='best')
         plt.grid()
-
 
         # Save or display the plot
         if save_path:
