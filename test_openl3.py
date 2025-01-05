@@ -57,6 +57,10 @@ if __name__ == "__main__":
                 plot_dir = args[i + 1]
                 plot_name = args[i + 2]
                 plot_method = args[i + 3]
+            elif args[i] == "--calc-cos-sim":
+                calc_cos_sim = True
+                cos_sim_filename = args[i + 1]
+
     except (IndexError, ValueError) as e:
         print(f"Error: {e}")
         print_instructions()
@@ -85,3 +89,10 @@ if __name__ == "__main__":
             visualizer.plot_embeddings(method="pca", save_path=f"{plot_dir}/{plot_name}_pca.png")
         else:
             visualizer.plot_embeddings(method=plot_method.lower(), save_path=f"{plot_dir}/{plot_name}_{plot_method.lower()}.png")
+    
+    # Calculate and display cosine similarity between centroids
+    if calc_cos_sim:
+        similarity_df = visualizer.calculate_cosine_similarity()
+        if cos_sim_filename:
+            similarity_df.to_csv(cos_sim_filename)
+            print(f"Cosine similarity DataFrame saved to {cos_sim_filename}")

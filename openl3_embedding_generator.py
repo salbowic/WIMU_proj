@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from typing import Optional
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
 import sys
     
 class EmbeddingVisualizer:
@@ -159,6 +161,29 @@ class EmbeddingVisualizer:
             
         self.centroids = genre_centroids
         return genre_centroids
+
+
+    def calculate_cosine_similarity(self):
+        """
+        Calculate the cosine similarity between different centroids and display the results in a table.
+        """
+        if not self.centroids:
+            raise ValueError("No centroids available. Run `generate_embeddings()` and `load_embeddings()` first.")
+
+        # Convert centroids to a numpy array
+        centroids_array = np.array(list(self.centroids.values()))
+        genre_labels = list(self.centroids.keys())
+
+        # Calculate cosine similarity
+        similarity_matrix = cosine_similarity(centroids_array)
+
+        # Create a DataFrame for better visualization
+        similarity_df = pd.DataFrame(similarity_matrix, index=genre_labels, columns=genre_labels)
+
+        print("Cosine Similarity between Genre Centroids:")
+        print(similarity_df)
+
+        return similarity_df
 
 
     def plot_embeddings(
