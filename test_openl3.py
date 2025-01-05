@@ -92,6 +92,8 @@ if __name__ == "__main__":
     
     # Calculate and display cosine similarity between centroids
     if calc_cos_sim:
+        visualizer = EmbeddingVisualizer()
+        visualizer.load_embeddings(input_dir=embedding_dir)
         similarity_df = visualizer.calculate_cosine_similarity()
         if cos_sim_filename:
             similarity_df.to_csv(cos_sim_filename)
