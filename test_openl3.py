@@ -13,7 +13,7 @@ def print_instructions():
     --embedding-dir <embedding_dir>    
         Directory to save and/or load embeddings (default: results/embeddings). Embeddings are saved in /<embedding_dir>/class
     --plot <plot_dir> <plot_name> <plot_method> 
-        Directory to save plots, name of the plot file, and plot method (tsne, pca, or both) (default: results/plots plot1.png both)
+        Directory to save plots, name of the plot file, and plot method (tsne, pca, or both) (default: results/plots plot1 both)
     --help                             
         Show this help message and exit
     """

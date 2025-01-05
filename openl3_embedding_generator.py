@@ -13,9 +13,7 @@ class EmbeddingVisualizer:
     def __init__(
         self,
         dataset_folder: str = None,
-        model = openl3.models.load_audio_embedding_model(input_repr="mel128",
-                                                         content_type="music",
-                                                         embedding_size=6144)
+        model = None
         ):
         """
         Initialize the visualizer with the dataset folder path.
@@ -31,14 +29,18 @@ class EmbeddingVisualizer:
     def get_dataset_folder(self):
         return self.dataset_folder
     
+        
     def set_dataset_folder(self, dataset_folder):
         self.dataset_folder = dataset_folder
-        
+
+      
     def get_model(self):
         return self.model
-    
+ 
+   
     def set_model(self, model):
         self.model = model
+
 
     def generate_embeddings(self, num_samples_per_genre: int = 10, emb_dir: str = 'results/embeddings/embeddings1'):
         """
@@ -93,7 +95,7 @@ class EmbeddingVisualizer:
 
         for genre in genres:
             genre_folder = os.path.join(input_dir, genre)
-            files = [file for file in os.listdir(genre_folder) if file.endswith('_emb.npz')]
+            files = [file for file in os.listdir(genre_folder) if file.endswith('.npz')]
 
             for file in files:
                 file_path = os.path.join(genre_folder, file)
@@ -101,7 +103,16 @@ class EmbeddingVisualizer:
                 try:
                     # Load the saved embedding
                     data = np.load(file_path)
-                    embedding = data['embedding']
+                    print(f"Keys in {file_path}: {list(data.keys())}")
+                    
+                    if 'embedding' in data:
+                        embedding = data['embedding']
+                    elif 'data' in data:
+                        embedding = data['data']
+                    else:
+                        raise KeyError(f"Neither 'embedding' nor 'data' key found in {file_path}")
+                    
+                    print(f"Shape of embedding in {file_path}: {embedding.shape}")
                     mean_emb = embedding.mean(axis=0)  # Use mean embedding for simplicity
                     
                     # Store the embedding and label
@@ -112,30 +123,37 @@ class EmbeddingVisualizer:
                     print(f"Failed to load {file_path}: {e}")
 
         # Calculate centroids
-        self._calculate_genre_centroids(input_dir=input_dir)
+        self._calculate_genre_centroids()
         
         print(f"Loaded {len(self.embeddings)} embeddings from all genres.")
   
   
-    def _calculate_genre_centroids(self, input_dir: str = 'results/embeddings/embeddings1'):
+    def _calculate_genre_centroids(self):
         """
         Calculate and return the centroids of the genre embeddings.
-        :param input_dir: Directory where the embeddings are saved.
         :return: Dictionary with genres as keys and centroid embeddings as values.
         """
-        if not self.embeddings:
-            self.load_embeddings(input_dir)
-        
         genre_centroids = {}
         genres = np.unique(self.labels)
         
         for genre in genres:
             genre_embeddings = [self.embeddings[i] for i in range(len(self.embeddings)) if self.labels[i] == genre]
-            genre_centroid = np.mean(genre_embeddings, axis=0)
-            genre_centroids[genre] = genre_centroid
-        
+            print(f"Calculating centroid for genre: {genre}, number of embeddings: {len(genre_embeddings)}")
+            
+            # Ensure all embeddings have the same shape
+            if len(genre_embeddings) > 0:
+                first_shape = genre_embeddings[0].shape
+                if all(emb.shape == first_shape for emb in genre_embeddings):
+                    genre_centroid = np.mean(genre_embeddings, axis=0)
+                    genre_centroids[genre] = genre_centroid
+                else:
+                    print(f"Inconsistent shapes found in embeddings for genre: {genre}")
+                    raise ValueError(f"Inconsistent shapes found in embeddings for genre: {genre}")
+            
         self.centroids = genre_centroids
-    
+        return genre_centroids
+
+ 
     def plot_embeddings(
         self, 
         method: str = "pca", 
