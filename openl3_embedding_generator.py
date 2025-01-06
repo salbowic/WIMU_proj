@@ -30,16 +30,13 @@ class EmbeddingVisualizer:
         
     def get_dataset_folder(self):
         return self.dataset_folder
-    
-        
+       
     def set_dataset_folder(self, dataset_folder):
         self.dataset_folder = dataset_folder
 
-      
     def get_model(self):
         return self.model
- 
-   
+  
     def set_model(self, model):
         self.model = model
 
