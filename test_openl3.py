@@ -60,6 +60,7 @@ if __name__ == "__main__":
             elif args[i] == "--calc-cos-sim":
                 calc_cos_sim = True
                 cos_sim_filename = args[i + 1]
+                cos_sim_plot_filename = args[i + 2]
 
     except (IndexError, ValueError) as e:
         print(f"Error: {e}")
@@ -98,3 +99,6 @@ if __name__ == "__main__":
         if cos_sim_filename:
             similarity_df.to_csv(cos_sim_filename, sep=';')
             print(f"Cosine similarity DataFrame saved to {cos_sim_filename}")
+        
+        if cos_sim_plot_filename:
+            visualizer.plot_cosine_similarity(similarity_df, save_path=cos_sim_plot_filename)

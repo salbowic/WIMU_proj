@@ -10,6 +10,7 @@ from typing import Optional
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 import sys
+import seaborn as sns
     
 class EmbeddingVisualizer:
     def __init__(
@@ -144,7 +145,6 @@ class EmbeddingVisualizer:
         
         for genre in genres:
             genre_embeddings = [self.embeddings[i] for i in range(len(self.embeddings)) if self.labels[i] == genre]
-            print(f"Calculating centroid for genre: {genre}, number of embeddings: {len(genre_embeddings)}")
             
             # Ensure all embeddings have the same shape
             if len(genre_embeddings) > 0:
@@ -174,13 +174,17 @@ class EmbeddingVisualizer:
         # Calculate cosine similarity
         similarity_matrix = cosine_similarity(centroids_array)
 
+        # Calculate differences (1 - cosine similarity)
+        similarity_diff_matrix = 1 - similarity_matrix
+        
+        # Normalize the differences to a range of 0 to 1
+        max_value = similarity_diff_matrix.max()
+        similarity_diff_normalized = similarity_diff_matrix / max_value
+        
         # Create a DataFrame for better visualization
-        similarity_df = pd.DataFrame(similarity_matrix, index=genre_labels, columns=genre_labels)
+        similarity_diff_df = pd.DataFrame(similarity_diff_normalized, index=genre_labels, columns=genre_labels)
 
-        print("Cosine Similarity between Genre Centroids:")
-        print(similarity_df)
-
-        return similarity_df
+        return similarity_diff_df
 
 
     def plot_embeddings(
@@ -247,4 +251,31 @@ class EmbeddingVisualizer:
         else:
             plt.show()
       
-            
+    
+    def plot_cosine_similarity(self, similarity_diff_df, save_path: Optional[str] = None):
+        """
+        Plot the normalized cosine similarity differences between different centroids.
+        :param similarity_diff_df: DataFrame containing the normalized cosine similarity differences.
+        :param save_path: Path to save the plot. If None, the plot will be displayed.
+        """
+        # Highlight the diagonal values in red
+        mask = np.zeros_like(similarity_diff_df, dtype=bool)
+        np.fill_diagonal(mask, True)
+
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(similarity_diff_df, annot=True, cmap='viridis', cbar_kws={'label': 'Normalized 1 - Cosine Similarity'}, mask=mask, linewidths=.5, linecolor='red')
+        plt.title('Normalized Cosine Similarity Differences (1 - Cosine Similarity)')
+        plt.xlabel('Genres')
+        plt.ylabel('Genres')
+
+        # Ensure the file is saved with a .png extension
+        if save_path and not save_path.endswith('.png'):
+            save_path += '.png'
+
+        # Save or display the plot
+        if save_path:
+            plt.savefig(save_path, format='png', dpi=300)
+            print(f"Plot saved to {save_path}")
+            plt.close()
+        else:
+            plt.show()
