@@ -54,6 +54,7 @@ class EmbeddingVisualizer:
             genre_folder = os.path.join(self.dataset_folder, genre)
             files = [file for file in os.listdir(genre_folder) if file.endswith(('.wav', '.ogg', '.flac'))]
 
+            random.seed(42)
             # Randomly sample files from each genre
             random.shuffle(files)
             sampled_files = files[:num_samples_per_genre]
@@ -186,42 +187,66 @@ class EmbeddingVisualizer:
 
         return similarity_diff_df
 
+    def calculate_genre_variance(self):
+        """
+        Calculate the mean variance of embeddings for different genres.
+        :return: DataFrame containing the mean variance for each genre.
+        """
+        if not self.embeddings:
+            raise ValueError("No embeddings available. Run `generate_embeddings()` or 'load_embeddings()' first.")
+
+        genre_variances = {}
+        genres = np.unique(self.labels)
+
+        for genre in genres:
+            idx = np.where(np.array(self.labels) == genre)[0]
+            genre_embeddings = np.array(self.embeddings)[idx]
+            genre_variance = np.var(genre_embeddings, axis=0).mean()  # Calculate mean variance across all dimensions
+            genre_variances[genre] = genre_variance
+
+        # Create a DataFrame for better visualization
+        variance_df = pd.DataFrame([genre_variances])
+        variance_df.index = ["Mean Variance"]
+
+        return variance_df
+    
 
     def plot_embeddings(
         self, 
         method: str = "pca", 
-        save_path: Optional[str] = None
+        title: Optional[str] = "openl3",
+        plot_dir: str = "results/plots",
+        perplexity: int = 30
     ):
         """
         Visualize embeddings using PCA or t-SNE, coloring by genre.
         :param method: Dimensionality reduction method ('pca' or 'tsne').
-        :param save_path: Path to save the plot. If None, the plot will be displayed.
+        :param title: Title to be used at the beginning of the plot title and for generating the save path.
+        :param plot_dir: Directory to save the plot.
         """
         if not self.embeddings:
             raise ValueError("No embeddings available. Run `generate_embeddings()` first.")
 
         embeddings_array = np.array(self.embeddings)
+        centroids_array = np.array(list(self.centroids.values()))
 
-        
         if method == "pca":
             reducer = PCA(n_components=2)
             reduced_emb = reducer.fit_transform(embeddings_array)
             reduced_centroids = reducer.fit_transform(np.array(list(self.centroids.values())))
+            
         elif method == "tsne":
+            combined_array = np.vstack((embeddings_array, centroids_array))
             n_samples = len(embeddings_array)
-            perplexity = min(30, max(1, n_samples - 1))
+            perplexity = min(perplexity, max(1, n_samples - 1))
             print(f"Using perplexity={perplexity} for t-SNE")
             reducer = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+            reduced_combined = reducer.fit_transform(combined_array)
+            reduced_emb = reduced_combined[:n_samples]
+            reduced_centroids = reduced_combined[n_samples:]
             
-            reduced_emb = reducer.fit_transform(embeddings_array)
-            
-            # Adjust perplexity for centroids
-            centroid_perplexity = min(30, max(1, len(self.centroids) - 1))
-            centroid_reducer = TSNE(n_components=2, perplexity=centroid_perplexity, random_state=42)
-            reduced_centroids = centroid_reducer.fit_transform(np.array(list(self.centroids.values())))
         else:
             raise ValueError("Invalid method. Choose 'pca' or 'tsne'.")
-
 
         # Plot the embeddings
         plt.figure(figsize=(12, 10))
@@ -235,28 +260,27 @@ class EmbeddingVisualizer:
             for i, (genre, centroid) in enumerate(self.centroids.items()):
                 reduced_centroid = reduced_centroids[i]
                 plt.scatter(reduced_centroid[0], reduced_centroid[1], s=200, marker='X', edgecolors='k')
-        
-         
-        plt.title(f"Audio Embeddings Visualization ({method.upper()})")
+
+        plot_title = f"{title} - Audio Embeddings Visualization ({method.upper()})"
+        plt.title(plot_title)
         plt.xlabel("Dimension 1")
         plt.ylabel("Dimension 2")
         plt.legend(title="Genre", loc='best')
         plt.grid()
 
-        # Save or display the plot
-        if save_path:
-            plt.savefig(save_path, format='png', dpi=300)
-            print(f"Plot saved to {save_path}")
-            plt.close()
-        else:
-            plt.show()
+        # Generate save path
+        save_path = os.path.join(plot_dir, f"{title.replace(' ', '_')}_{method.lower()}.png")
+        plt.savefig(save_path, format='png', dpi=300)
+        print(f"Plot saved to {save_path}")
+        plt.close()
       
     
-    def plot_cosine_similarity(self, similarity_diff_df, save_path: Optional[str] = None):
+    def plot_cosine_similarity(self, similarity_diff_df, title: Optional[str] = "Cosine Similarity", plot_dir: str = "results/plots"):
         """
         Plot the normalized cosine similarity differences between different centroids.
         :param similarity_diff_df: DataFrame containing the normalized cosine similarity differences.
-        :param save_path: Path to save the plot. If None, the plot will be displayed.
+        :param title: Title to be used for the plot title and for generating the save path.
+        :param plot_dir: Directory to save the plot.
         """
         # Highlight the diagonal values in red
         mask = np.zeros_like(similarity_diff_df, dtype=bool)
@@ -264,18 +288,14 @@ class EmbeddingVisualizer:
 
         plt.figure(figsize=(10, 8))
         sns.heatmap(similarity_diff_df, annot=True, cmap='viridis', cbar_kws={'label': 'Normalized 1 - Cosine Similarity'}, mask=mask, linewidths=.5, linecolor='red')
-        plt.title('Normalized Cosine Similarity Differences (1 - Cosine Similarity)')
+        plt.title(f'{title} - Normalized Cosine Similarity Differences (1 - Cosine Similarity)')
         plt.xlabel('Genres')
         plt.ylabel('Genres')
 
-        # Ensure the file is saved with a .png extension
-        if save_path and not save_path.endswith('.png'):
-            save_path += '.png'
+        # Generate save path
+        save_path = os.path.join(plot_dir, f"{title.replace(' ', '_')}_cosine_similarity.png")
 
         # Save or display the plot
-        if save_path:
-            plt.savefig(save_path, format='png', dpi=300)
-            print(f"Plot saved to {save_path}")
-            plt.close()
-        else:
-            plt.show()
+        plt.savefig(save_path, format='png', dpi=300)
+        print(f"Plot saved to {save_path}")
+        plt.close()
