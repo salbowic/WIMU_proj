@@ -42,10 +42,11 @@ class EmbeddingVisualizer:
         self.model = model
 
 
-    def generate_embeddings(self, num_samples_per_genre: int = 10, emb_dir: str = 'results/embeddings/embeddings1'):
+    def generate_embeddings(self, num_samples_per_genre: Optional[int] = None, emb_dir: str = 'results/embeddings/embeddings1'):
         """
         Generate embeddings for audio files in the dataset.
-        :param num_samples_per_genre: Number of audio samples to process per genre.
+        :param num_samples_per_genre: Number of audio samples to process per genre. If None, process all samples.
+        :param emb_dir: Directory to save the embeddings.
         """
         genres = [genre for genre in os.listdir(self.dataset_folder) if os.path.isdir(os.path.join(self.dataset_folder, genre))]
         print(f"Found genres: {genres}")
@@ -54,12 +55,17 @@ class EmbeddingVisualizer:
             genre_folder = os.path.join(self.dataset_folder, genre)
             files = [file for file in os.listdir(genre_folder) if file.endswith(('.wav', '.ogg', '.flac'))]
 
-            random.seed(42)
-            # Randomly sample files from each genre
-            random.shuffle(files)
-            sampled_files = files[:num_samples_per_genre]
-            total_files = len(sampled_files)
+            # If num_samples_per_genre is None, process all files
+            if num_samples_per_genre is None:
+                sampled_files = files
+            else:
+                # Randomly sample files from each genre
+                random.seed(42)
+                random.shuffle(files)
+                sampled_files = files[:num_samples_per_genre]
 
+            total_files = len(sampled_files)
+            
             for i, file in enumerate(sampled_files):
                 file_path = os.path.join(genre_folder, file)
                 output_dir = f'{emb_dir}/{genre}'
@@ -164,6 +170,7 @@ class EmbeddingVisualizer:
     def calculate_cosine_similarity(self):
         """
         Calculate the cosine similarity between different centroids and display the results in a table.
+        :return: DataFrame containing normalized cosine similarity differences.
         """
         if not self.centroids:
             raise ValueError("No centroids available. Run `generate_embeddings()` and `load_embeddings()` first.")

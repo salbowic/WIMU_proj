@@ -33,7 +33,7 @@ if __name__ == "__main__":
     input_repr = "mel128"
     embedding_size = 6144
     dataset_folder = "gtzan_dataset/genres_original"
-    n_samples_per_genre = 100
+    n_samples_per_genre = None
     generate_embeddings = False
     plot = False
     embedding_dir = "results/embeddings/gtzan_embeddings_mel128_6144"
@@ -89,12 +89,10 @@ if __name__ == "__main__":
         print_instructions()
         sys.exit(1)
 
-    # Create output folder for results
-    os.makedirs(embedding_dir, exist_ok=True)
-    os.makedirs(plot_dir, exist_ok=True)
-
     # Generate embeddings for the specified number of samples per genre
     if generate_embeddings:
+        # Create output folder for results
+        os.makedirs(embedding_dir, exist_ok=True)
         # Initialize the visualizer with the dataset folder
         visualizer = EmbeddingVisualizer()
         model = openl3.models.load_audio_embedding_model(input_repr=input_repr, content_type="music", embedding_size=embedding_size)
@@ -117,6 +115,7 @@ if __name__ == "__main__":
 
     # Load embeddings from file
     if plot:
+        os.makedirs(plot_dir, exist_ok=True)
         visualizer = EmbeddingVisualizer()
         visualizer.load_embeddings(input_dir=embedding_dir)
         
@@ -129,6 +128,7 @@ if __name__ == "__main__":
     
     # Calculate and display cosine similarity between centroids
     if calc_metrics:
+        os.makedirs(cos_sim_plot_dir, exist_ok=True)
         if not plot:
             visualizer = EmbeddingVisualizer()
             visualizer.load_embeddings(input_dir=embedding_dir)
