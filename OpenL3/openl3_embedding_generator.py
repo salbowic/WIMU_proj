@@ -270,6 +270,7 @@ class EmbeddingVisualizer:
 
         plot_title = f"{title} - Audio Embeddings Visualization ({method.upper()})"
         plt.title(plot_title)
+        plt.tight_layout(pad=2.0)
         plt.xlabel("Dimension 1")
         plt.ylabel("Dimension 2")
         plt.legend(title="Genre", loc='best')
@@ -296,6 +297,7 @@ class EmbeddingVisualizer:
         plt.figure(figsize=(10, 8))
         sns.heatmap(similarity_diff_df, annot=True, cmap='viridis', cbar_kws={'label': 'Normalized 1 - Cosine Similarity'}, mask=mask, linewidths=.5, linecolor='red')
         plt.title(f'{title} - Normalized Cosine Similarity Differences (1 - Cosine Similarity)')
+        plt.tight_layout(pad=2.0)
         plt.xlabel('Genres')
         plt.ylabel('Genres')
 

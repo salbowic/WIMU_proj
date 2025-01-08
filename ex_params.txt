@@ -1,7 +1,20 @@
---dataset dataset/instruments
+# Path to the dataset directory
+--dataset dataset/songs
+
+# Embedding methods to use (clamp2, openl3, or both)
 --emb-methods both
---emb-dir results/embeddings/test
+
+# Directory to save embeddings (there will be methods info automatically added to name)
+--emb-dir results/embeddings/songs
+
+# Input representation for OpenL3
 --input-repr mel256
---embedding-size 6144
---plot test_plot_title both results/instruments/plots/test
---calc-metrics results/instruments/plots/test results/instruments/variance
+
+# Embedding size for OpenL3
+--embedding-size 512
+
+# Plot title, plot method (tsne, pca, or both), and directory to save plots
+--plot Plot both results/songs/plots
+
+# Cosine similarity plot directory and variance directory
+--calc-metrics results/songs/plots results/songs/variance

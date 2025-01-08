@@ -53,7 +53,11 @@ def main():
 
     if args.params_file:
         with open(args.params_file, 'r') as f:
-            file_args = f.read().split()
+            file_args = []
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    file_args.extend(line.split())
         args = parser.parse_args(file_args + unknown)
 
     dataset_dir = args.dataset
@@ -68,7 +72,7 @@ def main():
     clamp2_elapsed_time = None
 
     if emb_methods in ['openl3', 'both']:
-        openl3_emb_dir = f"{emb_dir}_openl3"
+        openl3_emb_dir = f"{emb_dir}_openl3_{input_repr}_{embedding_size}"
         os.makedirs(openl3_emb_dir, exist_ok=True)
         
         # Initialize the visualizer with the dataset folder
@@ -90,18 +94,20 @@ def main():
             os.makedirs(plot_dir_openl3, exist_ok=True)
             visualizer.load_embeddings(input_dir=openl3_emb_dir)
             if plot_method.lower() == "both":
-                visualizer.plot_embeddings(method="tsne", title=f"{plot_title}_openl3_tsne", plot_dir=plot_dir_openl3)
-                visualizer.plot_embeddings(method="pca", title=f"{plot_title}_openl3_pca", plot_dir=plot_dir_openl3)
+                visualizer.plot_embeddings(method="tsne", title=f"{plot_title}_openl3_{input_repr}_{embedding_size}", plot_dir=plot_dir_openl3)
+                visualizer.plot_embeddings(method="pca", title=f"{plot_title}_openl3_{input_repr}_{embedding_size}", plot_dir=plot_dir_openl3)
             else:
-                visualizer.plot_embeddings(method=plot_method.lower(), title=f"{plot_title}_openl3", plot_dir=plot_dir_openl3)
+                visualizer.plot_embeddings(method=plot_method.lower(), title=f"{plot_title}_openl3_{input_repr}_{embedding_size}", plot_dir=plot_dir_openl3)
 
         if calc_metrics_args:
             cos_sim_plot_dir, variance_dir = calc_metrics_args
             cos_sim_plot_dir_openl3 = os.path.join(cos_sim_plot_dir, "openl3")
-            cos_sim_plot_title_openl3 = f"cos_sim_openl3_{input_repr}_{embedding_size}"
+            cos_sim_plot_title_openl3 = f"openl3_{input_repr}_{embedding_size}"
             variance_path_openl3 = f"{variance_dir}/variance_openl3_{input_repr}_{embedding_size}.csv"
             os.makedirs(cos_sim_plot_dir_openl3, exist_ok=True)
-            visualizer.load_embeddings(input_dir=openl3_emb_dir)
+            if not plot_args:
+                visualizer = EmbeddingVisualizer()
+                visualizer.load_embeddings(input_dir=openl3_emb_dir)
             similarity_diff_df = visualizer.calculate_cosine_similarity()
             visualizer.plot_cosine_similarity(similarity_diff_df, title=cos_sim_plot_title_openl3, plot_dir=cos_sim_plot_dir_openl3)
             variance_df = visualizer.calculate_genre_variance()
@@ -140,18 +146,20 @@ def main():
             visualizer = EmbeddingVisualizer()
             visualizer.load_embeddings(input_dir=clamp2_emb_dir)
             if plot_method.lower() == "both":
-                visualizer.plot_embeddings(method="tsne", title=f"{plot_title}_clamp2_tsne", plot_dir=plot_dir_clamp2)
-                visualizer.plot_embeddings(method="pca", title=f"{plot_title}_clamp2_pca", plot_dir=plot_dir_clamp2)
+                visualizer.plot_embeddings(method="tsne", title=f"{plot_title}_clamp2", plot_dir=plot_dir_clamp2)
+                visualizer.plot_embeddings(method="pca", title=f"{plot_title}_clamp2", plot_dir=plot_dir_clamp2)
             else:
                 visualizer.plot_embeddings(method=plot_method.lower(), title=f"{plot_title}_clamp2", plot_dir=plot_dir_clamp2)
 
         if calc_metrics_args:
             cos_sim_plot_dir, variance_dir = calc_metrics_args
             cos_sim_plot_dir_clamp2 = os.path.join(cos_sim_plot_dir, "clamp2")
-            cos_sim_plot_title_clamp2 = "cos_sim_clamp2"
+            cos_sim_plot_title_clamp2 = "clamp2"
             variance_path_clamp2 = f"{variance_dir}/variance_clamp2.csv"
             os.makedirs(cos_sim_plot_dir_clamp2, exist_ok=True)
-            visualizer.load_embeddings(input_dir=clamp2_emb_dir)
+            if not plot_args:
+                visualizer = EmbeddingVisualizer()
+                visualizer.load_embeddings(input_dir=clamp2_emb_dir)
             similarity_diff_df = visualizer.calculate_cosine_similarity()
             visualizer.plot_cosine_similarity(similarity_diff_df, title=cos_sim_plot_title_clamp2, plot_dir=cos_sim_plot_dir_clamp2)
             variance_df = visualizer.calculate_genre_variance()
