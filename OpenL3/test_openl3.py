@@ -88,6 +88,12 @@ if __name__ == "__main__":
         print(f"Error: {e}")
         print_instructions()
         sys.exit(1)
+        
+    # Ensure embedding_dir is an absolute path
+    embedding_dir = os.path.abspath(embedding_dir)
+    plot_dir = os.path.abspath(plot_dir)
+    cos_sim_plot_dir = os.path.abspath(cos_sim_plot_dir)
+    variance_path = os.path.abspath(variance_path)
 
     # Generate embeddings for the specified number of samples per genre
     if generate_embeddings:
