@@ -30,7 +30,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # Default values
-    input_repr = "mel128"
+    input_repr = "mel256"
     embedding_size = 6144
     dataset_folder = "gtzan_dataset/genres_original"
     n_samples_per_genre = None

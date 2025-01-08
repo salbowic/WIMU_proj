@@ -3,6 +3,7 @@ import os
 import numpy as np
 import mido
 from tqdm import tqdm
+import shutil
 import random
 import math
 import subprocess
@@ -100,8 +101,6 @@ class Clamp2EmbeddingGenerator:
             mtf_dir = os.path.join(base_dir + '_mtf', genre_dir)
             os.makedirs(mtf_dir, exist_ok=True)
             
-            print(f"Processing file: {file}", f"Saving to directory: {mtf_dir}")
-            
             try:
                 output = self._load_midi(file)
 
@@ -112,7 +111,6 @@ class Clamp2EmbeddingGenerator:
                     continue
                 else:
                     mtf_file_path = os.path.join(mtf_dir, ".".join(filename.split(".")[:-1]) + '.mtf')
-                    print(f"Writing MTF file to: {mtf_file_path}")
                     with open(mtf_file_path, 'w', encoding='utf-8') as f:
                         f.write(output)
             except Exception as e:
@@ -152,9 +150,9 @@ class Clamp2EmbeddingGenerator:
         :param mtf_dir: Path to the MTF directory.
         :param emb_dir: Path to the embedding directory.
         """
-        command = f"python code/extract_m3.py {mtf_dir} {emb_dir}"
+        command = f"python Clamp2/clamp2_github/code/extract_m3.py {mtf_dir} {emb_dir}"
         try:
-            subprocess.run(command, check=True, shell=True)
+            subprocess.run(command, check=True, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as e:
             print(f"An error occurred while running the command: {e}")
     
@@ -197,9 +195,15 @@ class Clamp2EmbeddingGenerator:
                 self._convert_midi2mtf()
                 
             mtf_dir = (os.path.join(self.mtf_dir, genre))
-            print("Log 3A:", mtf_dir)
             # Run the extract_m3.py script
+            print(f"Clamp2 m3 processing genre: {genre}")
             self._run_extract_m3(mtf_dir, self.emb_dir)
             #self.convert_emb_to_npz()
-        
-    
+            self._delete_mtf_directory()
+            
+    def _delete_mtf_directory(self):
+        base_dir = os.path.dirname(self.input_dir)
+        mtf_dir = base_dir + '_mtf'
+        if os.path.exists(mtf_dir):
+            shutil.rmtree(mtf_dir)
+ 

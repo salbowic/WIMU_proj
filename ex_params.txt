@@ -1,0 +1,7 @@
+--dataset dataset/instruments
+--emb-methods both
+--emb-dir results/embeddings/test
+--input-repr mel256
+--embedding-size 6144
+--plot test_plot_title both results/instruments/plots/test
+--calc-metrics results/instruments/plots/test results/instruments/variance
