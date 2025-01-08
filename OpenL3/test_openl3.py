@@ -13,8 +13,8 @@ def print_instructions():
         Generate embeddings with specified parameters (default: mel128 6144 gtzan_dataset/genres_original 100)
     --embedding-dir <embedding_dir>    
         Directory to save and/or load embeddings (default: results/embeddings). Embeddings are saved in /<embedding_dir>/class
-    --plot <plot_dir> <plot_title> <plot_method> 
-        Directory to save plots, title of the plot, and plot method (tsne, pca, or both) (default: results/plots plot1 both)
+    --plot <plot_title> <plot_method> <plot_dir>
+        Title of the plot,  plot method (tsne, pca, or both) and directory to save plots (default: plot1 both results/plots)
     --calc-metrics [<cos_sim_filename>] [<cos_sim_plot_title>] [<cos_sim_plot_dir>] [<variance_path>]
         Calculate cosine similarity differences between centroids, save the DataFrame to the specified filename, save the plot with the specified title in the specified directory, and calculate variance of different genres and save the DataFrame to the specified path and filename (default: results/openl3_cos_sim.csv Cosine Similarity results/plots results/variance/genre_variance.csv)
     --help                            
