@@ -2,7 +2,6 @@ m3_compatible = True  # Set to True for M3 compatibility; set to False to retain
 import os
 import numpy as np
 import mido
-from tqdm import tqdm
 import shutil
 import random
 import math
@@ -94,7 +93,7 @@ class Clamp2EmbeddingGenerator:
 
 
     def _midi2mtf(self, file_list):
-        for file in tqdm(file_list):
+        for file in file_list:
             filename = file.split('/')[-1]
             genre_dir = os.path.basename(os.path.dirname(file))
             base_dir = os.path.dirname(os.path.dirname(file))  # Get the base directory (e.g., dataset/songs)
@@ -195,11 +194,16 @@ class Clamp2EmbeddingGenerator:
                 self._convert_midi2mtf()
                 
             mtf_dir = (os.path.join(self.mtf_dir, genre))
+            
+            num_files = len([f for f in os.listdir(genre_input_dir) if f.endswith('.mid') or f.endswith('.midi')])
+            print(f"Clamp2 m3 processing {num_files} files from: {genre}")
             # Run the extract_m3.py script
-            print(f"Clamp2 m3 processing genre: {genre}")
             self._run_extract_m3(mtf_dir, self.emb_dir)
-            #self.convert_emb_to_npz()
+            
+            #self.convert_emb_to_npz() # optional: convert .npy to .npz
+            
             self._delete_mtf_directory()
+            
             
     def _delete_mtf_directory(self):
         base_dir = os.path.dirname(self.input_dir)

@@ -80,7 +80,7 @@ class EmbeddingVisualizer:
                     self.failed_files.append(file_path)
 
                 # Update progress
-                sys.stdout.write(f"\rProcessed {i + 1}/{total_files} files from genre: {genre}")
+                sys.stdout.write(f"\rProcessed {i + 1}/{total_files} files from: {genre}")
                 sys.stdout.flush()
 
             print()
