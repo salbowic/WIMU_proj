@@ -230,6 +230,7 @@ class EmbeddingVisualizer:
         :param method: Dimensionality reduction method ('pca' or 'tsne').
         :param title: Title to be used at the beginning of the plot title and for generating the save path.
         :param plot_dir: Directory to save the plot.
+        :param perplexity: Perplexity value for t-SNE.
         """
         if not self.embeddings:
             raise ValueError("No embeddings available. Run `generate_embeddings()` first.")
